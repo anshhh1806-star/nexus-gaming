@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS GAMING</title>
+<style>
+:root{--bg:#080d1b;--panel:#111b31;--blue:#168cff;--cyan:#00d9ff;--text:#f4f7ff;--muted:#9eacc5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#0b1224ee;backdrop-filter:blur(12px);padding:15px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #243451}
+.logo{font-size:23px;font-weight:900;color:var(--cyan);letter-spacing:2px}
+nav a{color:white;text-decoration:none;margin:0 10px;font-size:14px}
+button,.btn{border:0;border-radius:8px;padding:11px 17px;background:var(--blue);color:white;font-weight:bold;cursor:pointer}
+button:hover,.btn:hover{background:#006bd6}
+.outline{background:transparent;border:1px solid var(--blue)}
+section{padding:65px 7%;scroll-margin-top:70px}
+.hero{min-height:440px;display:flex;align-items:center;background:radial-gradient(ellipse at 80% 40%,#123c72,transparent 55%),linear-gradient(120deg,#080d1b,#101d37)}
+.hero h1{font-size:clamp(40px,7vw,75px);margin:10px 0;color:white}
+.hero h1 span{color:var(--cyan)}
+.hero p{color:var(--muted);font-size:18px;max-width:550px;line-height:1.6}
+.tag{color:var(--cyan);letter-spacing:3px;font-weight:bold}
+h2{font-size:32px;margin-top:0}
+.sub{color:var(--muted);margin-top:-10px;margin-bottom:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid #263a5d;border-radius:14px;padding:20px;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--cyan)}
+.game-icon{font-size:40px}
+.card h3{margin:12px 0 7px}
+.card p{color:var(--muted);font-size:14px;line-height:1.5}
+.card button{margin-top:8px}
+.dark{background:#0d1629}
+.profile{display:flex;align-items:center;gap:12px}
+#playerName{color:var(--cyan);font-weight:bold}
+#loginArea{display:flex;align-items:center;gap:10px}
+input{padding:12px;border:1px solid #385078;border-radius:8px;background:#0a1325;color:white;width:100%;margin:7px 0}
+#modal{display:none;position:fixed;inset:0;background:#000c;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modalbox{background:#101b31;border:1px solid #31517b;border-radius:15px;padding:22px;width:min(650px,100%);max-height:90vh;overflow:auto}
+.modalhead{display:flex;justify-content:space-between;align-items:center}
+#gameArea{margin-top:18px;text-align:center;min-height:260px}
+canvas{background:#050a14;border:1px solid #345078;border-radius:10px;max-width:100%;touch-action:none}
+.game-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px}
+.game-actions button{min-width:48px}
+.tilegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;max-width:320px;margin:15px auto}
+.tile{background:#263b5d;border-radius:8px;padding:16px 4px;font-size:20px;font-weight:bold}
+.memorygrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:15px auto}
+.memorygrid button{height:65px;font-size:24px;background:#233959}
+#leaderboard{max-width:650px}
+table{width:100%;border-collapse:collapse}
+td,th{text-align:left;padding:12px;border-bottom:1px solid #2b3d5b}
+footer{text-align:center;padding:28px;color:var(--muted);background:#070b15}
+.small{font-size:12px;color:var(--muted)}
+@media(max-width:650px){header{flex-wrap:wrap;gap:12px}nav{order:3;width:100%;overflow:auto;white-space:nowrap}nav a{margin-right:15px;margin-left:0}.hero{min-height:380px}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">NEXUS GAMING</div>
+ <nav>
+  <a href="#home">Home</a><a href="#games">Games</a>
+  <a href="#popular">Popular Games</a><a href="#scores">Leaderboard</a>
+  <a href="#about">About</a>
+ </nav>
+ <div id="loginArea"></div>
+</header>
+
+<section class="hero" id="home">
+ <div>
+  <div class="tag">WELCOME TO THE NEXT LEVEL</div>
+  <h1>PLAY. <span>COMPETE.</span><br>WIN.</h1>
+  <p>Your gaming zone for fun, challenges and high scores. Choose a game and start playing!</p>
+  <button onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">EXPLORE GAMES</button>
+ </div>
+</section>
+
+<section id="games">
+ <div class="tag">PLAY ONLINE</div><h2>Browser Games</h2>
+ <p class="sub">These original mini-games run directly in your browser.</p>
+ <div class="grid" id="gameCards"></div>
+</section>
+
+<section class="dark" id="popular">
+ <div class="tag">DISCOVER MORE</div><h2>Popular Games</h2>
+ <p class="sub">These are separate commercial games. Open their official websites to learn more.</p>
+ <div class="grid">
+  <div class="card"><div class="game-icon">🔥</div><h3>Free Fire India</h3><p>Official Free Fire India website.</p><a class="btn" target="_blank" rel="noopener" href="https://ffindia.garenaind.com/en/">Official Website ↗</a></div>
+  <div class="card"><div class="game-icon">🏎️</div><h3>Asphalt Legends</h3><p>Explore the arcade racing game by Gameloft.</p><a class="btn" target="_blank" rel="noopener" href="https://www.en.gameloft.com/">Official Gameloft ↗</a></div>
+  <div class="card"><div class="game-icon">⛏️</div><h3>Minecraft</h3><p>Explore the official Minecraft website.</p><a class="btn" target="_blank" rel="noopener" href="https://www.minecraft.net/en-us">Official Website ↗</a></div>
+  <div class="card"><div class="game-icon">🎮</div><h3>PUBG: Battlegrounds</h3><p>Visit the official PUBG website.</p><a class="btn" target="_blank" rel="noopener" href="https://pubg.com/en">Official Website ↗</a></div>
+ </div>
+</section>
+
+<section id="scores">
+ <div class="tag">YOUR PROGRESS</div><h2>Leaderboard</h2>
+ <p class="sub">Best scores saved on this browser.</p>
+ <div class="card" id="leaderboard"></div>
+ <p class="small">Demo leaderboard: scores are stored locally on this device and are not shared online.</p>
+</section>
+
+<section class="dark" id="about">
+ <div class="tag">ABOUT US</div><h2>Welcome to NEXUS GAMING</h2>
+ <p class="sub">A gaming website made for players who enjoy fun browser challenges. Play mini-games, beat your personal best and explore popular games.</p>
+ <div class="grid">
+  <div class="card"><div class="game-icon">⚡</div><h3>Instant Play</h3><p>Play mini-games without installing anything.</p></div>
+  <div class="card"><div class="game-icon">🏆</div><h3>High Scores</h3><p>Keep track of your best scores on this browser.</p></div>
+  <div class="card"><div class="game-icon">🌐</div><h3>Discover</h3><p>Find official websites for popular games.</p></div>
+ </div>
+</section>
+
+<footer>© 2026 NEXUS GAMING · Made for fun</footer>
+
+<div id="modal">
+ <div class="modalbox">
+  <div class="modalhead"><h2 id="gameTitle">Game</h2><button class="outline" onclick="closeGame()">✕</button></div>
+  <div id="gameArea"></div>
+  <div class="game-actions" id="gameControls"></div>
+  <p class="small" id="gameHelp"></p>
+ </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const read=(key,def)=>{try{return JSON.parse(localStorage.getItem(key))??def}catch{return def}};
+let player=localStorage.getItem("nexusPlayer")||"";
+let scores=read("nexusScores",{});
+let timer=null,keydown=null,currentGame="";
+
+const games=[
+ ["snake","🐍","Snake","Eat food and grow. Avoid walls and yourself."],
+ ["car","🏎️","Car Racing","Dodge the traffic and survive as long as possible."],
+ ["space","🚀","Space Shooter","Move and avoid incoming obstacles."],
+ ["tic","⭕","Tic Tac Toe","Two-player classic. Get three in a row."],
+ ["pong","🏓","Ping Pong","Keep the ball in play with your paddle."],
+ ["brick","🧱","Brick Breaker","Bounce the ball to clear the bricks."],
+ ["memory","🧠","Memory Match","Find all matching pairs."],
+ ["2048","🔢","2048","Combine matching tiles to reach 2048."],
+ ["reaction","⚡","Reaction Test","Wait for green, then click as quickly as you can."]
+];
+
+function renderLogin(){
+ $("loginArea").innerHTML=player
+ ? `<div class="profile"><span id="playerName">👤 ${escapeHTML(player)}</span><button class="outline" onclick="logout()">Logout</button></div>`
+ : `<button onclick="login()">Player Login</button>`;
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function login(){
+ const name=prompt("Enter your player name (no password needed):");
+ if(!name||!name.trim())return;
+ player=name.trim().slice(0,20);
+ localStorage.setItem("nexusPlayer",player);renderLogin();renderScores();
+}
+function logout(){player="";localStorage.removeItem("nexusPlayer");renderLogin();}
+function renderGames(){
+ $("gameCards").innerHTML=games.map(g=>`<div class="card"><div class="game-icon">${g[1]}</div><h3>${g[2]}</h3><p>${g[3]}</p><button onclick="startGame('${g[0]}')">Play Now</button></div>`).join("");
+}
+function saveScore(game,score){
+ if(!player){alert("Login first to save your high score.");return;}
+ let key=player+"|"+game;
+ scores[key]=Math.max(scores[key]||0,Math.floor(score));
+ localStorage.setItem("nexusScores",JSON.stringify(scores));
+ renderScores();
+}
+function renderScores(){
+ const rows=Object.entries(scores).map(([key,score])=>({name:key.split("|")[0],game:key.split("|")[1],score}))
+ .sort((a,b)=>b.score-a.score).slice(0,20);
+ $("leaderboard").innerHTML=rows.length?`<table><tr><th>Player</th><th>Game</th><th>Best score</th></tr>${rows.map(r=>`<tr><td>${escapeHTML(r.name)}</td><td>${escapeHTML(r.game)}</td><td>${r.score}</td></tr>`).join("")}</table>`:"No scores yet. Play a game to get started!";
+}
+function stop(){if(timer){clearInterval(timer);timer=null;}if(keydown){document.removeEventListener("keydown",keydown);keydown=null;}}
+function closeGame(){stop();$("modal").style.display="none";}
+function setup(title,help,html,controls=""){
+ $("gameTitle").textContent=title;$("gameHelp").textContent=help;
+ $("gameArea").innerHTML=html;$("gameControls").innerHTML=controls;
+}
+function startGame(id){
+ if(!player){login();if(!player)return;}
+ stop();currentGame=id;$("modal").style.display="flex";
+ const g=games.find(x=>x[0]===id);
+ if(id==="snake")snake();
+ if(id==="tic")tic();
+ if(id==="memory")memory();
+ if(id==="2048")game2048();
+ if(id==="reaction")reaction();
+ if(id==="car")canvasGame("car");
+ if(id==="space")canvasGame("space");
+ if(id==="pong")canvasGame("pong");
+ if(id==="brick")canvasGame("brick");
+}
+
+function snake(){
+ let s=[{x:8,y:8}],dir={x:1,y:0},food={x:13,y:8},score=0,dead=false;
+ setup("🐍 Snake","Arrow keys / WASD to move. Eat the red food.",'<canvas id="cv" width="400" height="400"></canvas>',`<button onclick="startGame('snake')">Restart</button>`);
+ let c=$("cv").getContext("2d");
+ keydown=e=>{let k=e.key.toLowerCase(),d={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]}[k];if(d&&!(d[0]===-dir.x&&d[1]===-dir.y)){dir={x:d[0],y:d[1]};e.preventDefault();}};
+ document.addEventListener("keydown",keydown);
+ function draw(){
+  c.fillStyle="#07101e";c.fillRect(0,0,400,400);
+  c.fillStyle="#ff5d70";c.fillRect(food.x*20,food.y*20,18,18);
+  c.fillStyle="#00d9a5";s.forEach(p=>c.fillRect(p.x*20,p.y*20,18,18));
+  c.fillStyle="white";c.font="15px Arial";c.fillText("Score: "+score,8,18);
+ }
+ draw();
+ timer=setInterval(()=>{
+  if(dead)return;
+  let h={x:s[0].x+dir.x,y:s[0].y+dir.y};
+  if(h.x<0||h.y<0||h.x>=20||h.y>=20||s.some(p=>p.x===h.x&&p.y===h.y)){dead=true;saveScore("Snake",score);$("gameHelp").textContent="Game over! Final score: "+score;return;}
+  s.unshift(h);
+  if(h.x===food.x&&h.y===food.y){score+=10;food={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)};}
+  else s.pop();draw();
+ },120);
+}
+
+function tic(){
+ let board=Array(9).fill(""),turn="X",over=false;
+ setup("⭕ Tic Tac Toe","Two players take turns. Match three squares.",'<div id="ticBoard" class="tilegrid"></div><h3 id="ticMsg">X turn</h3>',`<button onclick="startGame('tic')">Restart</button>`);
+ function draw(){
+  $("ticBoard").innerHTML=board.map((v,i)=>`<button class="tile" onclick="move(${i})">${v}</button>`).join("");
+  $("ticMsg").textContent=over?"Game finished":turn+" turn";
+ }
+ window.move=i=>{
+  if(over||board[i])return;board[i]=turn;
+  let win=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(a=>a.every(n=>board[n]===turn));
+  if(win){over=true;$("ticMsg").textContent=turn+" wins!";saveScore("Tic Tac Toe",1);}
+  else if(board.every(Boolean)){over=true;$("ticMsg").textContent="Draw!";}
+  else turn=turn==="X"?"O":"X";draw();
+ };
+ draw();
+}
+
+function memory(){
+ let vals=["🎮","🚀","🏆","🎧","🎯","⭐","🔥","👾", "🎮","🚀","🏆","🎧","🎯","⭐","🔥","👾"].sort(()=>Math.random()-.5),open=[],matched=[],moves=0;
+ setup("🧠 Memory Match","Select two cards and find all matching pairs.",'<div class="memorygrid" id="mem"></div><h3 id="memMsg">Moves: 0</h3>',`<button onclick="startGame('memory')">Restart</button>`);
+ function draw(){
+  $("mem").innerHTML=vals.map((v,i)=>`<button onclick="flip(${i})">${matched.includes(i)||open.includes(i)?v:"?"}</button>`).join("");
+  $("memMsg").textContent="Moves: "+moves+" · Pairs: "+matched.length/2;
+ }
+ window.flip=i=>{
+  if(open.length===2||open.includes(i)||matched.includes(i))return;
+  open.push(i);draw();
+  if(open.length===2){moves++;if(vals[open[0]]===vals[open[1]]){matched.push(...open);open=[];draw();if(matched.length===16)saveScore("Memory Match",Math.max(1,100-moves));}
+   else timer=setTimeout(()=>{open=[];draw();timer=null;},700);}
+ };
+ draw();
+}
+
+function game2048(){
+ let b=Array(16).fill(0),score=0;
+ function add(){let empty=b.map((v,i)=>v?null:i).filter(v=>v!==null);if(empty.length)b[empty[Math.floor(Math.random()*empty.length)]]=Math.random()<.9?2:4;}
+ add();add();
+ setup("🔢 2048","Use arrow keys to combine equal numbers.",'<div id="board2048" class="tilegrid"></div><h3 id="score2048"></h3>',`<button onclick="startGame('2048')">Restart</button>`);
+ function draw(){$("board2048").innerHTML=b.map(v=>`<div class="tile">${v||""}</div>`).join("");$("score2048").textContent="Score: "+score;}
+ function slide(line){
+  let a=line.filter(Boolean),out=[];
+  for(let i=0;i<a.length;i++){if(a[i]===a[i+1]){out.push(a[i]*2);score+=a[i]*2;i++;}else out.push(a[i]);}
+  while(out.length<4)out.push(0);return out;
+ }
+ keydown=e=>{
+  let old=b.join(",");
+  for(let n=0;n<4;n++){
+   let ids=Array.from({length:4},(_,i)=>e.key==="ArrowLeft"?n*4+i:e.key==="ArrowRight"?n*4+3-i:e.key==="ArrowUp"?i*4+n:(3-i)*4+n);
+   if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key))return;
+   let out=slide(ids.map(i=>b[i]));ids.forEach((id,i)=>b[id]=out[i]);
+  }
+  if(old!==b.join(",")){add();draw();if(b.includes(2048))saveScore("2048",score);}
+  e.preventDefault();
+ };
+ document.addEventListener("keydown",keydown);draw();
+}
+
+function reaction(){
+ let state="wait",start=0,best=9999;
+ setup("⚡ Reaction Test","Wait until the box turns green, then click it.",'<button id="reactBox" style="width:100%;height:190px;font-size:24px;background:#b83c4c">Wait for green...</button><h3 id="reactMsg"></h3>',`<button onclick="startGame('reaction')">Try Again</button>`);
+ function ready(){state="ready";$("reactBox").style.background="#00a875";$("reactBox").textContent="CLICK NOW!";start=Date.now();}
+ timer=setTimeout(ready,1200+Math.random()*2500);
+ $("reactBox").onclick=()=>{
+  if(state==="wait"){clearTimeout(timer);timer=null;state="early";$("reactBox").textContent="Too early!";$("reactBox").style.background="#b83c4c";}
+  else if(state==="ready"){let ms=Date.now()-start;state="done";$("reactMsg").textContent="Your reaction: "+ms+" ms";saveScore("Reaction Test",Math.max(1,1000-ms));}
+ };
+}
+
+function canvasGame(type){
+ const names={car:"🏎️ Car Racing",space:"🚀 Space Shooter",pong:"🏓 Ping Pong",brick:"🧱 Brick Breaker"};
+ setup(names[type],"Use arrow keys or A/D. Press Space to start or pause if needed.",'<canvas id="cv" width="420" height="420"></canvas>',`<button onclick="startGame('${type}')">Restart</button><button onclick="closeGame()">Close</button>`);
+ const c=$("cv"),ctx=c.getContext("2d");
+ let keys={},score=0,ended=false,playerX=190,playerY=350,objects=[],ball={x:210,y:210,dx:3,dy:3},paddle=170,bricks=[];
+ if(type==="brick")for(let r=0;r<4;r++)for(let col=0;col<7;col++)bricks.push({x:10+col*57,y:35+r*24,on:true});
+ keydown=e=>{keys[e.key.toLowerCase()]=true;if(["ArrowLeft","ArrowRight"," ","ArrowUp","ArrowDown"].includes(e.key))e.preventDefault();};
+ document.addEventListener("keydown",keydown);
+ let up=e=>{keys[e.key.toLowerCase()]=false;};document.addEventListener("keyup",up);
+ function finish(){if(ended)return;ended=true;saveScore(names[type].replace(/^.. /,""),score);$("gameHelp").textContent="Game over · Score: "+score;}
+ timer=setInterval(()=>{
+  if(ended)return;
+  ctx.fillStyle="#050a14";ctx.fillRect(0,0,420,420);
+  ctx.fillStyle="#fff";ctx.font="16px Arial";ctx.fillText("Score: "+score,10,20);
+  if(type==="car"||type==="space"){
+   if(keys.arrowleft||keys.a)playerX-=5;if(keys.arrowright||keys.d)playerX+=5;
+   playerX=Math.max(0,Math.min(380,playerX));
+   if(Math.random()<.035)objects.push({x:Math.random()*380,y:-25});
+   objects.forEach(o=>o.y+=type==="car"?5:4);
+   objects=objects.filter(o=>o.y<440);
+   ctx.fillStyle=type==="car"?"#20a6ff":"#00d9a5";ctx.fillRect(playerX,playerY,35,45);
+   ctx.fillStyle="#ff6378";objects.forEach(o=>{ctx.fillRect(o.x,o.y,28,35);if(o.x<playerX+35&&o.x+28>playerX&&o.y<playerY+45&&o.y+35>playerY)finish();});
+   if(!ended)score++;
+  }
+  if(type==="pong"){
+   if(keys.arrowleft||keys.a)paddle-=6;if(keys.arrowright||keys.d)paddle+=6;paddle=Math.max(0,Math.min(340,paddle));
+   ball.x+=ball.dx;ball.y+=ball.dy;
+   if(ball.x<8||ball.x>412)ball.dx*=-1;if(ball.y<8)ball.dy*=-1;
+   if(ball.y>380&&ball.y<395&&ball.x>paddle&&ball.x<paddle+80){ball.dy=-Math.abs(ball.dy);score++;}
+   if(ball.y>420)finish();
+   ctx.fillStyle="#00d9ff";ctx.fillRect(paddle,390,80,12);
+   ctx.beginPath();ctx.arc(ball.x,ball.y,9,0,Math.PI*2);ctx.fill();
+  }
+  if(type==="brick"){
+   if(keys.arrowleft||keys.a)paddle-=6;if(keys.arrowright||keys.d)paddle+=6;paddle=Math.max(0,Math.min(340,paddle));
+   ball.x+=ball.dx;ball.y+=ball.dy;
+   if(ball.x<8||ball.x>412)ball.dx*=-1;if(ball.y<8)ball.dy*=-1;
+   if(ball.y>380&&ball.y<400&&ball.x>paddle&&ball.x<paddle+80)ball.dy=-Math.abs(ball.dy);
+   if(ball.y>420)finish();
+   bricks.forEach(b=>{if(b.on){ctx.fillStyle="#168cff";ctx.fillRect(b.x,b.y,49,15);if(ball.x>b.x&&ball.x<b.x+49&&ball.y>b.y&&ball.y<b.y+15){b.on=false;ball.dy*=-1;score+=10;}}});
+   ctx.fillStyle="#00d9ff";ctx.fillRect(paddle,395,80,10);
+   ctx.beginPath();ctx.arc(ball.x,ball.y,8,0,Math.PI*2);ctx.fill();
+   if(bricks.every(b=>!b.on)){finish();}
+  }
+ },30);
+}
+renderLogin();renderGames();renderScores();
+</script>
+</body>
+</htm
